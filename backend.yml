@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+        - name: backend-container
+          image: gokuldocker1311/devops:latest
+          ports:
+            - containerPort: 5039
+            - containerPort: 5181  # Add additional ports as needed
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-service
+spec:
+  selector:
+    app: backend
+  ports:
+    - protocol: TCP
+      port: 5039
+      targetPort: 5039
+      name: port-5039
+    - protocol: TCP
+      port: 5181
+      targetPort: 5181
+      name: port-5181
+        # Add additional ports as needed
+  type: ClusterIP  # Adjust service type based on your environment

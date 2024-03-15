@@ -1,0 +1,27 @@
+# Build Stage
+FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
+WORKDIR /src
+
+COPY payments-api.csproj .
+RUN dotnet restore
+
+COPY . .
+RUN dotnet publish -c Release -o /app
+
+# Final Stage
+FROM mcr.microsoft.com/dotnet/aspnet:7.0-alpine AS final
+WORKDIR /app
+
+# Copy the published application
+COPY --from=build /app .
+
+# Expose ports
+EXPOSE 5039
+EXPOSE 5181
+
+# Set environment variable for DOTNET_URLS
+ENV DOTNET_URLS "http://+:5039;http://+:5181"
+ENV ASPNETCORE_ENVIRONMENT=Development
+
+# Run the application
+CMD ["dotnet", "payments-api.dll"]
